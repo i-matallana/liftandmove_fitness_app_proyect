@@ -1,9 +1,11 @@
 import 'dart:core';
 import 'package:flutter/material.dart';
 import 'package:flutter_app_liftmove/core/theme/app_theme.dart';
+import 'package:flutter_app_liftmove/core/theme/widgets/customs_bg.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:lottie/lottie.dart';
 import 'package:flutter_app_liftmove/screens/survey_screen.dart';
+import 'package:flutter_app_liftmove/lib/core/theme/widgets/custom_bg.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
@@ -258,91 +260,3 @@ class LoginButton extends StatelessWidget {
   }
 }
 
-class LogoIcon extends StatelessWidget {
-  final double size;
-
-  const LogoIcon({super.key, required this.size}); 
-  @override
-  Widget build(BuildContext context) {
-    return SvgPicture.asset(
-      'assets/images/logo_purple.svg',
-      width: size
-    );
-  }
-}
-
-
-//difuminado para el fondo
-class BlurredBlob extends StatelessWidget {
-  final double size;
-  final Color color;
-
-  const BlurredBlob({
-    super.key, 
-    this.size = 200, required this.color,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      width: size,
-      height: size,
-      decoration: BoxDecoration(
-        shape: BoxShape.circle,
-        // La magia está aquí:
-        boxShadow: [
-          BoxShadow(
-            color: color.withOpacity(0.3),
-            blurRadius: 80,               // Mucho difuminado
-            spreadRadius: 40,             
-          ),
-        ],
-      ),
-    );
-  }
-}
-
-// formato de bg
-class CustomBg extends StatelessWidget {
-  const CustomBg({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    return Stack(children: 
-      [
-        const Positioned(
-            top: -80,
-            left: -80,
-            child: BlurredBlob(
-              size: 250,
-              color: AppColors.purpleLilac,
-            ),
-        ),
-        const Positioned(
-            bottom: 255,
-            right: -80,
-            child: BlurredBlob(
-              size: 250,
-              color: AppColors.skyBlue,
-          ),
-        ),
-        const Positioned(
-            bottom: -100,
-            left: -2,
-            child: BlurredBlob(
-              size: 250,
-              color: AppColors.lightPink,
-          ),
-        ),
-        const Positioned(
-          top: 25,
-          left: 0,
-          right: 0,
-          child: Center(
-            child: LogoIcon(size: 65),
-          ),
-        ),
-      ],
-    );
-  }
-}
