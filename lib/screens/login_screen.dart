@@ -2,10 +2,8 @@ import 'dart:core';
 import 'package:flutter/material.dart';
 import 'package:flutter_app_liftmove/core/theme/app_theme.dart';
 import 'package:flutter_app_liftmove/core/theme/widgets/customs_bg.dart';
-import 'package:flutter_svg/svg.dart';
 import 'package:lottie/lottie.dart';
 import 'package:flutter_app_liftmove/screens/survey_screen.dart';
-import 'package:flutter_app_liftmove/lib/core/theme/widgets/custom_bg.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
@@ -62,7 +60,7 @@ class _LoginScreenState extends State<LoginScreen> {
               ],
             ),
           ),
-          Align(
+          Align(  
             alignment: Alignment.bottomCenter,
             child: IgnorePointer( 
               child: Lottie.asset(

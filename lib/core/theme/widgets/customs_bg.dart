@@ -49,7 +49,8 @@ class LogoIcon extends StatelessWidget {
 
 // formato de bg
 class CustomBg extends StatelessWidget {
-  const CustomBg({super.key});
+  final bool showLogo;
+  const CustomBg({super.key, this.showLogo = true});
 
   @override
   Widget build(BuildContext context) {
@@ -79,13 +80,14 @@ class CustomBg extends StatelessWidget {
               color: AppColors.lightPink,
           ),
         ),
-        const Positioned(
-          top: 25,
-          left: 0,
-          right: 0,
-          child: Center(
-            child: LogoIcon(size: 65),
-          ),
+        if (showLogo)
+          const Positioned(
+            top: 25,
+            left: 0,
+            right: 0,
+            child: Center(
+              child: LogoIcon(size: 65)
+            ),
         ),
       ],
     );

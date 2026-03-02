@@ -1,10 +1,9 @@
 import 'package:flutter/material.dart';
 
-class QuestionOne extends StatelessWidget {
+class InicialPage extends StatelessWidget {
   final VoidCallback onNext;
-  final VoidCallback onBack;
 
-  const QuestionOne({super.key, required this.onNext, required this.onBack});
+  const InicialPage({super.key, required this.onNext});
 
   @override
   Widget build(BuildContext context) {
@@ -13,7 +12,6 @@ class QuestionOne extends StatelessWidget {
         Text("Pregunta 1"),
         Row(
           children: [
-            ElevatedButton(onPressed: onBack, child: Text("Atrás")),
             ElevatedButton(onPressed: onNext, child: Text("Siguiente")),
           ],
         ),
