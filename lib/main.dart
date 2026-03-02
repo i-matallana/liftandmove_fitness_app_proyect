@@ -1,27 +1,23 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_app_liftmove/screens/login_screen.dart';
+import 'screens/pantalla3.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:flutter_native_splash/flutter_native_splash.dart';
-
 
 void main() {
-  runApp(const MainApp());
+  runApp(const MyApp());
 }
 
-class MainApp extends StatelessWidget {
-  const MainApp({super.key});
+class MyApp extends StatelessWidget {
+  const MyApp({super.key});
 
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      debugShowCheckedModeBanner: false,
+      title: 'Flutter Demo',
       theme: ThemeData(
-        textTheme: GoogleFonts.ralewayTextTheme(), // aplica a toda la app
-        useMaterial3: true,),
-      home: LoginScreen(
+        useMaterial3: true,
+        textTheme: GoogleFonts.montserratTextTheme(Theme.of(context).textTheme),
       ),
+      home: PantallaInicio(),
     );
   }
 }
-
-
