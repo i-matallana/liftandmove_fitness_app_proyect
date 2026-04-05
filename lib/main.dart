@@ -1,8 +1,18 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_app_liftmove/screens/login_screen.dart';
+import 'package:flutter/services.dart';
+import 'package:flutter_app_liftmove/screens/signup_screen.dart';
 import 'package:google_fonts/google_fonts.dart';
 
-void main() {
+void main() async {
+  // 1. Asegura que los servicios de Flutter estén inicializados antes de bloquear la orientación
+  WidgetsFlutterBinding.ensureInitialized();
+
+  // 2. Bloquea la app en modo vertical (Portrait)
+  await SystemChrome.setPreferredOrientations([
+    DeviceOrientation.portraitUp,
+    DeviceOrientation.portraitDown,
+  ]);
+
   runApp(const MyApp());
 }
 
@@ -17,7 +27,8 @@ class MyApp extends StatelessWidget {
         useMaterial3: true,
         textTheme: GoogleFonts.ralewayTextTheme(Theme.of(context).textTheme),
       ),
-      home: LoginScreen(),
+      debugShowCheckedModeBanner: false,
+      home: const SignupScreen(),
     );
   }
 }

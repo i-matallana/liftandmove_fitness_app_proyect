@@ -4,7 +4,8 @@ import 'package:flutter_app_liftmove/core/theme/widgets/question_scaffold.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 
 class QuestionOne extends StatelessWidget {
-  const QuestionOne({super.key});
+  final Function(bool) onGenderSelected;
+  const QuestionOne({super.key, required this.onGenderSelected});
 
   @override
   Widget build(BuildContext context) {
@@ -19,7 +20,7 @@ class QuestionOne extends StatelessWidget {
               fontSize: 20,
             ),
           ),
-          const SizedBox(height: 40),
+          const SizedBox(height: 70),
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 30),
             child: Row(
@@ -31,13 +32,13 @@ class QuestionOne extends StatelessWidget {
                     child: Column(
                       children: [
                         SvgPicture.asset(
-                          'assets/images/hombre_survey.svg', 
-                          height: 300,
+                          'assets/images/human_resources/man_walking.svg', 
+                          height: 250,
                         ),
-                        const SizedBox(height: 15),
+                        const SizedBox(height: 45),
                         ElevatedButton(
                           onPressed: () {
-                            // Acción para hombre
+                            onGenderSelected(true);
                           },
                           style: ElevatedButton.styleFrom(
                             backgroundColor: AppColors.oceanBlue,
@@ -67,13 +68,13 @@ class QuestionOne extends StatelessWidget {
                     child: Column(
                       children: [
                         SvgPicture.asset(
-                          'assets/images/mujer_survey.svg', // Asegúrate de tener la ruta correcta
-                          height: 270,
+                          'assets/images/human_resources/woman_walking.svg', // Asegúrate de tener la ruta correcta
+                          height: 250,
                         ),
                         const SizedBox(height: 45),
                         ElevatedButton(
                           onPressed: () {
-                            // Acción para mujer
+                            onGenderSelected(false);
                           },
                           style: ElevatedButton.styleFrom(
                             backgroundColor: AppColors.berry,

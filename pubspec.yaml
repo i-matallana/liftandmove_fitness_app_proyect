@@ -7,6 +7,7 @@ environment:
   sdk: '^3.10.0'
 
 dependencies:
+  tuple: ^2.0.0
   flutter:
     sdk: flutter
   flutter_native_splash: ^2.4.7
@@ -27,6 +28,7 @@ flutter:
     - assets/images/hombre_survey.svg
     - assets/images/mujer_survey.svg
     - assets/walking_login.json
+    - assets/images/human_resources/
   fonts:
     - family: HeuvelGrotesk
       fonts:

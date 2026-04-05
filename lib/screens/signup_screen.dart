@@ -3,17 +3,17 @@ import 'package:flutter/material.dart';
 import 'package:flutter_app_liftmove/core/theme/app_theme.dart';
 import 'package:flutter_app_liftmove/core/theme/widgets/customs_bg.dart';
 import 'package:lottie/lottie.dart';
-import 'package:flutter_app_liftmove/screens/home_screen.dart';
-import 'package:flutter_app_liftmove/screens/signup_screen.dart';
+import 'package:flutter_app_liftmove/screens/survey_screen.dart';
+import 'package:flutter_app_liftmove/screens/login_screen.dart';
 
-class LoginScreen extends StatefulWidget {
-  const LoginScreen({super.key});
+class SignupScreen extends StatefulWidget {
+  const SignupScreen({super.key});
 
   @override
-  State<LoginScreen> createState() => _LoginScreenState();
+  State<SignupScreen> createState() => _SignupScreenState();
 }
 
-class _LoginScreenState extends State<LoginScreen> {
+class _SignupScreenState extends State<SignupScreen> {
   bool _isPasswordVisible = false;
   final TextEditingController _usuarioController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
@@ -60,7 +60,7 @@ class _LoginScreenState extends State<LoginScreen> {
 
     Navigator.push(
       context,
-      MaterialPageRoute(builder: (context) => const HomeScreen()),
+      MaterialPageRoute(builder: (context) => const SurveyScreen()),
     );
   }
 
@@ -94,12 +94,12 @@ class _LoginScreenState extends State<LoginScreen> {
       backgroundColor: AppColors.whiteHlight,
       body: Stack(
         children: [
-          // 1. FONDO: Ocupa toda la pantalla (incluyendo status bar)
+          // 1. EL FONDO: Ahora fuera del SafeArea para cubrir el borde superior
           const Positioned.fill(
             child: IgnorePointer(child: CustomBg()),
           ),
 
-          // 2. CONTENIDO: Protegido por SafeArea
+          // 2. EL CONTENIDO: Envuelto en SafeArea para no chocar con la cámara/hora
           SafeArea(
             child: Column(
               children: [
@@ -109,9 +109,9 @@ class _LoginScreenState extends State<LoginScreen> {
                     padding: const EdgeInsets.symmetric(horizontal: 30),
                     child: Column(
                       children: [
-                        const LoginHeader(), // Corregido a LoginHeader
+                        const SignupHeader(),
                         const SizedBox(height: 25),
-                        LoginBox(
+                        SignupBox(
                           isPasswordVisible: _isPasswordVisible,
                           onTogglePassword: () {
                             setState(() => _isPasswordVisible = !_isPasswordVisible);
@@ -120,7 +120,7 @@ class _LoginScreenState extends State<LoginScreen> {
                           passwordController: _passwordController,
                         ),
                         const SizedBox(height: 40),
-                        LoginButton(onPressed: _validarYContinuar),
+                        SignupButton(onPressed: _validarYContinuar),
                         const SizedBox(height: 20),
                       ],
                     ),
@@ -130,7 +130,7 @@ class _LoginScreenState extends State<LoginScreen> {
             ),
           ),
 
-          // 3. ANIMACIÓN
+          // 3. LA ANIMACIÓN: Al frente y abajo
           Align(
             alignment: Alignment.bottomCenter,
             child: IgnorePointer(
@@ -148,8 +148,8 @@ class _LoginScreenState extends State<LoginScreen> {
   }
 }
 
-class LoginHeader extends StatelessWidget {
-  const LoginHeader({super.key});
+class SignupHeader extends StatelessWidget {
+  const SignupHeader({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -157,7 +157,7 @@ class LoginHeader extends StatelessWidget {
       children: [
         SizedBox(height: 80),
         Text(
-          '¡Hola!',
+          'Bienvenido',
           style: TextStyle(
             fontFamily: 'HeuvelGrotesk',
             fontSize: 45,
@@ -166,7 +166,7 @@ class LoginHeader extends StatelessWidget {
           ),
         ),
         Text(
-          'Es bueno tenerte de regreso',
+          'Da el primer paso a tu nuevo estilo de vida',
           style: TextStyle(
             color: AppColors.periwinkle,
             fontSize: 10,
@@ -179,13 +179,13 @@ class LoginHeader extends StatelessWidget {
   }
 }
 
-class LoginBox extends StatelessWidget {
+class SignupBox extends StatelessWidget {
   final bool isPasswordVisible;
   final VoidCallback onTogglePassword;
   final TextEditingController usuarioController;
   final TextEditingController passwordController;
 
-  const LoginBox({
+  const SignupBox({
     super.key,
     required this.isPasswordVisible,
     required this.onTogglePassword,
@@ -204,10 +204,10 @@ class LoginBox extends StatelessWidget {
           trailing: GestureDetector(
             onTap: () => Navigator.pushReplacement(
               context,
-              MaterialPageRoute(builder: (context) => const SignupScreen()),
+              MaterialPageRoute(builder: (context) => const LoginScreen()),
             ),
             child: const Text(
-              '¿No tienes cuenta?',
+              '¿Ya tienes cuenta?',
               style: TextStyle(
                 color: AppColors.periwinkle,
                 fontSize: 11,
@@ -228,7 +228,7 @@ class LoginBox extends StatelessWidget {
         _label(context, 'CONTRASEÑA'),
         _inputField(
           icon: Icons.lock_outline,
-          hint: 'Ingrese su contraseña',
+          hint: 'Crea tu contraseña',
           controller: passwordController,
           isPassword: true,
           obscureText: !isPasswordVisible,
@@ -313,9 +313,9 @@ class LoginBox extends StatelessWidget {
   }
 }
 
-class LoginButton extends StatelessWidget {
+class SignupButton extends StatelessWidget {
   final VoidCallback onPressed;
-  const LoginButton({super.key, required this.onPressed});
+  const SignupButton({super.key, required this.onPressed});
 
   @override
   Widget build(BuildContext context) {
@@ -345,7 +345,7 @@ class LoginButton extends StatelessWidget {
           shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(30)),
         ),
         child: const Text(
-          'INICIAR SESIÓN', // Corregido a Iniciar Sesión
+          'CREAR CUENTA',
           style: TextStyle(
             fontSize: 13,
             color: Colors.white,

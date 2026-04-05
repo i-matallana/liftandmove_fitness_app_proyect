@@ -82,7 +82,7 @@ class CustomBg extends StatelessWidget {
         ),
         if (showLogo)
           const Positioned(
-            top: 25,
+            top: 50,
             left: 0,
             right: 0,
             child: Center(

@@ -9,12 +9,12 @@ class QuestionScaffold extends StatelessWidget {
   });
 
   @override
-  Widget build(BuildContext context) {
-    return Column(
-      children: [
-        Expanded(child: child), 
-        const SizedBox(height: 80), 
-      ],
-    );
-  }
+Widget build(BuildContext context) {
+  return Column(
+    children: [
+      Expanded(child: child),
+      const SizedBox(height: 80),
+    ],
+  );
+}
 }
