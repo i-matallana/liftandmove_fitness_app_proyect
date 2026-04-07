@@ -2,7 +2,7 @@ import 'dart:io';
 import 'package:flutter/foundation.dart' show kIsWeb;
 
 class ApiConfig {
-  static const bool _usePhysicalDevice = false; 
+  static const bool _usePhysicalDevice = true; 
 
   // IP
   static const String _myIP = "192.168.1.8"; 

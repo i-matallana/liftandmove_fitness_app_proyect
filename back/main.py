@@ -31,11 +31,10 @@ def get_db_connection():
     return pymysql.connect(
         host='localhost',
         user='root',
-        password='',
+        password='1807191170@ros4nne95',
         database='rutinas_ejercicios',
         cursorclass=pymysql.cursors.DictCursor
     )
-
 class UserDataRegister(BaseModel):
     idUsu: str
     nombreUsu: str
