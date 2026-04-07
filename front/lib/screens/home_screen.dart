@@ -26,7 +26,7 @@ class HomeScreen extends StatelessWidget {
           Center(
             child: Column(
               children: [
-                const SizedBox(height: 250),
+                const SizedBox(height: 80),
                 Image.asset('assets/images/logo_purple.png', width: 280, height: 150),
                 const Text(
                   'Move your body, change your life',
