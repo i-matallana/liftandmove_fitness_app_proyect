@@ -44,7 +44,6 @@ class _SignupScreenState extends State<SignupScreen> {
       _mostrarSnackbar('El usuario no permite caracteres especiales');
       return;
     }
-
     if (password.isEmpty) {
       _mostrarSnackbar('La contraseña no puede estar vacía');
       return;
@@ -60,7 +59,12 @@ class _SignupScreenState extends State<SignupScreen> {
 
     Navigator.push(
       context,
-      MaterialPageRoute(builder: (context) => const SurveyScreen()),
+      MaterialPageRoute(
+        builder: (context) => SurveyScreen(
+          nombreUsu: usuario,
+          contrasenha: password,
+        ),
+      ),
     );
   }
 
@@ -94,12 +98,9 @@ class _SignupScreenState extends State<SignupScreen> {
       backgroundColor: AppColors.whiteHlight,
       body: Stack(
         children: [
-          // 1. EL FONDO: Ahora fuera del SafeArea para cubrir el borde superior
           const Positioned.fill(
             child: IgnorePointer(child: CustomBg()),
           ),
-
-          // 2. EL CONTENIDO: Envuelto en SafeArea para no chocar con la cámara/hora
           SafeArea(
             child: Column(
               children: [
@@ -114,7 +115,8 @@ class _SignupScreenState extends State<SignupScreen> {
                         SignupBox(
                           isPasswordVisible: _isPasswordVisible,
                           onTogglePassword: () {
-                            setState(() => _isPasswordVisible = !_isPasswordVisible);
+                            setState(() =>
+                                _isPasswordVisible = !_isPasswordVisible);
                           },
                           usuarioController: _usuarioController,
                           passwordController: _passwordController,
@@ -129,8 +131,6 @@ class _SignupScreenState extends State<SignupScreen> {
               ],
             ),
           ),
-
-          // 3. LA ANIMACIÓN: Al frente y abajo
           Align(
             alignment: Alignment.bottomCenter,
             child: IgnorePointer(
@@ -246,7 +246,8 @@ class SignupBox extends StatelessWidget {
     );
   }
 
-  Widget _label(BuildContext context, String text, {Widget? trailing}) => Padding(
+  Widget _label(BuildContext context, String text, {Widget? trailing}) =>
+      Padding(
         padding: const EdgeInsets.only(bottom: 8, left: 5),
         child: Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -306,7 +307,8 @@ class SignupBox extends StatelessWidget {
           suffixIcon: suffix,
           border: InputBorder.none,
           counterText: '',
-          contentPadding: const EdgeInsets.symmetric(vertical: 15, horizontal: 10),
+          contentPadding:
+              const EdgeInsets.symmetric(vertical: 15, horizontal: 10),
         ),
       ),
     );
@@ -342,7 +344,8 @@ class SignupButton extends StatelessWidget {
         style: ElevatedButton.styleFrom(
           backgroundColor: Colors.transparent,
           shadowColor: Colors.transparent,
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(30)),
+          shape:
+              RoundedRectangleBorder(borderRadius: BorderRadius.circular(30)),
         ),
         child: const Text(
           'CREAR CUENTA',

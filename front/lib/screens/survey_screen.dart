@@ -1,7 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:http/http.dart' as http; 
+import 'dart:convert';                   
 import 'package:flutter_app_liftmove/core/theme/app_theme.dart';
-import 'package:flutter_app_liftmove/core/theme/widgets/customs_bg.dart';
-import 'package:flutter_app_liftmove/core/theme/widgets/nav_buttons.dart';
+import 'package:flutter_app_liftmove/core/theme/widgets/question_scaffold.dart';
+
+// Pantallas de preguntas
 import 'package:flutter_app_liftmove/screens/surveyfolder/pages/inicial_page.dart';
 import 'package:flutter_app_liftmove/screens/surveyfolder/pages/question_one.dart';
 import 'package:flutter_app_liftmove/screens/surveyfolder/pages/question_two.dart';
@@ -11,181 +14,278 @@ import 'package:flutter_app_liftmove/screens/surveyfolder/pages/question_five.da
 import 'package:flutter_app_liftmove/screens/surveyfolder/pages/final_page.dart';
 
 class SurveyScreen extends StatefulWidget {
-  const SurveyScreen({super.key});
+  final String nombreUsu;
+  final String contrasenha; 
+
+  const SurveyScreen({
+    super.key,
+    required this.nombreUsu,
+    required this.contrasenha,
+  });
 
   @override
-  State<SurveyScreen> createState() => SurveyScreenState();
+  State<SurveyScreen> createState() => _SurveyScreenState();
 }
 
-class SurveyScreenState extends State<SurveyScreen> {
-  final PageController _controller = PageController();
+class _SurveyScreenState extends State<SurveyScreen> {
+ 
+  final PageController _pageController = PageController();
+  int _currentPage = 0;
 
-  int _currentpage = 0;
-  bool? _esHombre;
-  int _edad = 0;
-  double _altura = 150.0;
-  double _peso = 60.0;
-  Set<String> _metas = {};
+ 
+  bool _isMale = true;      
+  int _edad = 18;            
+  double _altura = 160.0;    
+  double _peso = 60.0;      
+  Set<String> _metas = {};   
 
-  void _nextPage() => _controller.nextPage(
-        duration: const Duration(milliseconds: 450),
-        curve: Curves.easeInOutCubic,
-      );
+  
+  bool _q1Done = false;
+  bool _q2Done = false;
+  bool _q3Done = true;  // altura tiene slider con valor inicial, siempre válido
+  bool _q4Done = true;  // peso tiene slider con valor inicial, siempre válido
+  bool _q5Done = false;
 
-  void _previousPage() => _controller.previousPage(
-        duration: const Duration(milliseconds: 450),
-        curve: Curves.easeInOutCubic,
-      );
-
-  String? _validarPagina() {
-    switch (_currentpage) {
-      case 1:
-        if (_esHombre == null) return 'Por favor selecciona tu género';
-        break;
-      case 2:
-        if (_edad == 0) return 'Por favor ingresa tu fecha de nacimiento';
-        break;
-      case 5:
-        if (_metas.isEmpty) return 'Por favor selecciona al menos un objetivo';
-        break;
-    }
-    return null;
-  }
-
-  void _intentarAvanzar() {
-    final error = _validarPagina();
-    if (error != null) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          elevation: 0,
-          content: Text(
-            error,
-            textAlign: TextAlign.center,
-              style: const TextStyle(
-                color: AppColors.berry,
-                fontWeight: FontWeight.w600,
-                fontSize: 10,
-            ),
-          ),
-          backgroundColor: AppColors.whiteHlight,
-          behavior: SnackBarBehavior.floating,
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(25)),
-          margin: const EdgeInsets.fromLTRB(40, 0, 40, 100),
-          duration: const Duration(seconds: 2),
-        ),
-      );
-      return;
-    }
-    _nextPage();
-  }
+  bool _isLoading = false; 
 
   @override
   void dispose() {
-    _controller.dispose();
+    _pageController.dispose();
     super.dispose();
   }
 
-  @override
-  Widget build(BuildContext context) {
-    const int totalPages = 7;
-    return Scaffold(
-      resizeToAvoidBottomInset: false,
-      extendBodyBehindAppBar: true,
-      appBar: AppBar(
-        title: TweenAnimationBuilder<double>(
-          tween: Tween(
-            begin: 0,
-            end: _currentpage / (totalPages - 1),
-          ),
-          duration: const Duration(milliseconds: 600),
-          curve: Curves.easeInOutCubic,
-          builder: (context, value, _) => ClipRRect(
-            borderRadius: BorderRadius.circular(10),
-            child: LinearProgressIndicator(
-              value: value,
-              minHeight: 6,
-              backgroundColor: Colors.white24,
-              valueColor: AlwaysStoppedAnimation<Color>(AppColors.darkPurple),
-            ),
-          ),
-        ),
-        backgroundColor: Colors.transparent,
-        elevation: 0,
-        scrolledUnderElevation: 0,
+  Future<void> _registrarUsuario() async {
+    setState(() => _isLoading = true);
+
+    const String baseUrl = 'http://10.0.2.2:8000'; 
+    final url = Uri.parse('$baseUrl/register');
+
+    final String sexo     = _isMale ? 'M' : 'F';
+    final String objetivo = _metas.join(', ');
+    final String idUsu    = widget.nombreUsu; 
+
+    try {
+      final response = await http.post(
+        url,
+        headers: {'Content-Type': 'application/json'}, 
+        body: json.encode({                             
+          'idUsu'           : idUsu,
+          'nombreUsu'       : widget.nombreUsu,
+          'correoUsu'       : '$idUsu@liftmove.app', 
+          'contrasenha'     : widget.contrasenha,    
+          'sexo'            : sexo,
+          'altura_cm'       : _altura.toInt(),
+          'peso'            : _peso.toInt(),
+          'objetivo_entreno': objetivo,
+        }),
+      );
+
+      final data = json.decode(response.body); 
+
+      if (response.statusCode == 200 || response.statusCode == 201) {
+        if (mounted) _irAPagina(6);
+      } else {
+        _mostrarError(data['detail'] ?? 'Error al registrar');
+      }
+    } catch (e) {
+      _mostrarError('No se pudo conectar. ¿Está encendido el servidor?');
+    } finally {
+      if (mounted) setState(() => _isLoading = false);
+    }
+  }
+
+  void _mostrarError(String msg) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(msg, textAlign: TextAlign.center),
+        backgroundColor: AppColors.berry,
+        behavior: SnackBarBehavior.floating,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+        margin: const EdgeInsets.fromLTRB(40, 0, 40, 80),
       ),
+    );
+  }
+
+  void _irAPagina(int page) {
+    _pageController.animateToPage(
+      page,
+      duration: const Duration(milliseconds: 400),
+      curve: Curves.easeInOut,
+    );
+  }
+
+  void _siguiente() {
+    if (_currentPage < 6) _irAPagina(_currentPage + 1);
+  }
+
+  void _anterior() {
+    if (_currentPage > 0) _irAPagina(_currentPage - 1);
+  }
+
+  bool get _puedeAvanzar {
+    switch (_currentPage) {
+      case 0: return true;
+      case 1: return _q1Done;
+      case 2: return _q2Done;
+      case 3: return _q3Done;
+      case 4: return _q4Done;
+      case 5: return _q5Done;
+      default: return false;
+    }
+  }
+
+  
+  Widget build(BuildContext context) {
+    return Scaffold(
       body: Stack(
         children: [
-          const CustomBg(showLogo: false),
-          Padding(
-            padding: const EdgeInsets.only(top: 100),
-            child: PageView(
-              controller: _controller,
-              physics: const NeverScrollableScrollPhysics(),
-              onPageChanged: (page) => setState(() => _currentpage = page),
-              children: [
-                const InicialPage(),
-                QuestionOne(
-                  onGenderSelected: (valor) {
-                    setState(() => _esHombre = valor);
-                    _nextPage();
+          //  PageView con las pantallas de preguntas
+          PageView(
+            controller: _pageController,
+            physics: const NeverScrollableScrollPhysics(),
+            onPageChanged: (i) => setState(() => _currentPage = i),
+            children: [
+  
+              const InicialPage(),
+
+              QuestionScaffold(
+                child: QuestionOne(
+                  onGenderSelected: (isMale) {
+                    setState(() {
+                      _isMale = isMale;
+                      _q1Done = true;
+                    });
+                   
                   },
                 ),
-                QuestionTwo(
-                  isMale: _esHombre ?? true, // ← fix
-                  onAgeSelected: (valor) {
-                    setState(() => _edad = valor);
-                  },
+              ),
+
+             
+              QuestionScaffold(
+                child: QuestionTwo(
+                  isMale: _isMale,
+                  onAgeSelected: (edad) => setState(() {
+                    _edad = edad;
+                    _q2Done = true;
+                  }),
                 ),
-                QuestionThree(
-                  isMale: _esHombre ?? true, // ← fix
-                  onHeightSelected: (valor) {
-                    setState(() => _altura = valor);
-                  },
+              ),
+
+             
+              QuestionScaffold(
+                child: QuestionThree(
+                  isMale: _isMale,
+                  onHeightSelected: (h) => setState(() {
+                    _altura = h;
+                    _q3Done = true;
+                  }),
                 ),
-                QuestionFour(
-                  isMale: _esHombre ?? true, // ← fix
+              ),
+
+             
+              QuestionScaffold(
+                child: QuestionFour(
+                  isMale: _isMale,
                   altura: _altura,
                   edad: _edad,
-                  onWeightSelected: (valor) {
-                    setState(() => _peso = valor);
-                  },
+                  onWeightSelected: (p) => setState(() {
+                    _peso = p;
+                    _q4Done = true;
+                  }),
                 ),
-                QuestionFive(
-                  onGoalSelected: (valor) {
-                    setState(() => _metas = valor);
-                  },
-                ),
-                const FinalPage(),
-              ],
-            ),
-          ),
-          Positioned(
-            bottom: 30 - MediaQuery.of(context).viewInsets.bottom,
-            left: 25,
-            right: 25,
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                if (_currentpage > 0)
-                  NavButton(
-                    onPressed: _previousPage,
-                    label: "ANTERIOR",
-                    isNext: false,
-                  )
-                else
-                  const SizedBox.shrink(),
+              ),
 
-                if (_currentpage < totalPages - 1)
-                  NavButton(
-                    onPressed: _intentarAvanzar, // ← fix
-                    label: "SIGUIENTE",
-                    isNext: true,
-                  )
-                else
-                  const SizedBox.shrink(),
-              ],
-            ),
+              
+              QuestionScaffold(
+                child: QuestionFive(
+                  onGoalSelected: (metas) => setState(() {
+                    _metas = metas;
+                    _q5Done = metas.isNotEmpty;
+                  }),
+                ),
+              ),
+
+              
+              const FinalPage(),
+            ],
           ),
+
+         
+          if (_currentPage > 0 && _currentPage < 6)
+            Positioned(
+              bottom: 30,
+              left: 20,
+              right: 20,
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  OutlinedButton(
+                    onPressed: _anterior,
+                    style: OutlinedButton.styleFrom(
+                      foregroundColor: AppColors.darkPurple,
+                      side: const BorderSide(
+                          color: AppColors.darkPurple, width: 0.5),
+                      shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(30)),
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 30, vertical: 12),
+                    ),
+                    child: const Text('Atrás'),
+                  ),
+
+               
+                  _isLoading
+                      ? const CircularProgressIndicator() 
+                      : ElevatedButton(
+                          onPressed: _puedeAvanzar
+                              ? () {
+                                  if (_currentPage == 5) {
+                                    _registrarUsuario(); 
+                                  } else {
+                                    _siguiente();
+                                  }
+                                }
+                              : null,
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: AppColors.oceanBlue,
+                            disabledBackgroundColor:
+                                AppColors.oceanBlue.withOpacity(0.3),
+                            foregroundColor: Colors.white,
+                            shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(30)),
+                            padding: const EdgeInsets.symmetric(
+                                horizontal: 30, vertical: 12),
+                          ),
+                          child: Text(
+                            _currentPage == 5 ? '¡Listo!' : 'Siguiente',
+                          ),
+                        ),
+                ],
+              ),
+            ),
+
+    
+          if (_currentPage == 0)
+            Positioned(
+              bottom: 30,
+              left: 20,
+              right: 20,
+              child: ElevatedButton(
+                onPressed: _siguiente,
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: AppColors.oceanBlue,
+                  foregroundColor: Colors.white,
+                  shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(30)),
+                  padding: const EdgeInsets.symmetric(vertical: 15),
+                ),
+                child: const Text(
+                  'Comenzar',
+                  style: TextStyle(
+                      fontSize: 16, fontWeight: FontWeight.bold),
+                ),
+              ),
+            ),
         ],
       ),
     );

@@ -1,5 +1,7 @@
 import 'dart:core';
 import 'package:flutter/material.dart';
+import 'package:http/http.dart' as http; 
+import 'dart:convert'; 
 import 'package:flutter_app_liftmove/core/theme/app_theme.dart';
 import 'package:flutter_app_liftmove/core/theme/widgets/customs_bg.dart';
 import 'package:lottie/lottie.dart';
@@ -15,6 +17,7 @@ class LoginScreen extends StatefulWidget {
 
 class _LoginScreenState extends State<LoginScreen> {
   bool _isPasswordVisible = false;
+  bool _isLoading = false; 
   final TextEditingController _usuarioController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
 
@@ -25,13 +28,15 @@ class _LoginScreenState extends State<LoginScreen> {
     super.dispose();
   }
 
-  void _validarYContinuar() {
+  
+  Future<void> _validarYContinuar() async {
     ScaffoldMessenger.of(context).removeCurrentSnackBar();
 
     final usuario = _usuarioController.text.trim();
     final password = _passwordController.text;
     final regexEspeciales = RegExp(r'[^a-zA-Z0-9]');
 
+    
     if (usuario.isEmpty) {
       _mostrarSnackbar('El usuario no puede estar vacío');
       return;
@@ -44,7 +49,6 @@ class _LoginScreenState extends State<LoginScreen> {
       _mostrarSnackbar('El usuario no permite caracteres especiales');
       return;
     }
-
     if (password.isEmpty) {
       _mostrarSnackbar('La contraseña no puede estar vacía');
       return;
@@ -58,10 +62,38 @@ class _LoginScreenState extends State<LoginScreen> {
       return;
     }
 
-    Navigator.push(
-      context,
-      MaterialPageRoute(builder: (context) => const HomeScreen()),
-    );
+    setState(() => _isLoading = true);
+
+
+    final url = Uri.parse('http://127.0.0.1:8000/login');
+
+    try {
+      final response = await http.post(
+        url,
+        headers: {'Content-Type': 'application/json'},
+        body: json.encode({                             
+          'nombreUsu': usuario,
+          'contrasenha': password,
+        }),
+      );
+
+      final data = json.decode(response.body); 
+
+      if (response.statusCode == 200) {
+        if (mounted) {
+          Navigator.push(
+            context,
+            MaterialPageRoute(builder: (context) => const HomeScreen()),
+          );
+        }
+      } else {
+        _mostrarSnackbar(data['detail'] ?? 'Credenciales incorrectas');
+      }
+    } catch (e) {
+      _mostrarSnackbar('⚠️ No se pudo conectar. ¿Está encendido el servidor?');
+    } finally {
+      if (mounted) setState(() => _isLoading = false);
+    }
   }
 
   void _mostrarSnackbar(String mensaje) {
@@ -94,12 +126,9 @@ class _LoginScreenState extends State<LoginScreen> {
       backgroundColor: AppColors.whiteHlight,
       body: Stack(
         children: [
-          // 1. FONDO: Ocupa toda la pantalla (incluyendo status bar)
           const Positioned.fill(
             child: IgnorePointer(child: CustomBg()),
           ),
-
-          // 2. CONTENIDO: Protegido por SafeArea
           SafeArea(
             child: Column(
               children: [
@@ -109,18 +138,22 @@ class _LoginScreenState extends State<LoginScreen> {
                     padding: const EdgeInsets.symmetric(horizontal: 30),
                     child: Column(
                       children: [
-                        const LoginHeader(), // Corregido a LoginHeader
+                        const LoginHeader(),
                         const SizedBox(height: 25),
                         LoginBox(
                           isPasswordVisible: _isPasswordVisible,
                           onTogglePassword: () {
-                            setState(() => _isPasswordVisible = !_isPasswordVisible);
+                            setState(() =>
+                                _isPasswordVisible = !_isPasswordVisible);
                           },
                           usuarioController: _usuarioController,
                           passwordController: _passwordController,
                         ),
                         const SizedBox(height: 40),
-                        LoginButton(onPressed: _validarYContinuar),
+                        
+                        _isLoading
+                            ? const CircularProgressIndicator()
+                            : LoginButton(onPressed: _validarYContinuar),
                         const SizedBox(height: 20),
                       ],
                     ),
@@ -129,8 +162,6 @@ class _LoginScreenState extends State<LoginScreen> {
               ],
             ),
           ),
-
-          // 3. ANIMACIÓN
           Align(
             alignment: Alignment.bottomCenter,
             child: IgnorePointer(
@@ -147,6 +178,8 @@ class _LoginScreenState extends State<LoginScreen> {
     );
   }
 }
+
+
 
 class LoginHeader extends StatelessWidget {
   const LoginHeader({super.key});
@@ -246,7 +279,8 @@ class LoginBox extends StatelessWidget {
     );
   }
 
-  Widget _label(BuildContext context, String text, {Widget? trailing}) => Padding(
+  Widget _label(BuildContext context, String text, {Widget? trailing}) =>
+      Padding(
         padding: const EdgeInsets.only(bottom: 8, left: 5),
         child: Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -306,7 +340,8 @@ class LoginBox extends StatelessWidget {
           suffixIcon: suffix,
           border: InputBorder.none,
           counterText: '',
-          contentPadding: const EdgeInsets.symmetric(vertical: 15, horizontal: 10),
+          contentPadding:
+              const EdgeInsets.symmetric(vertical: 15, horizontal: 10),
         ),
       ),
     );
@@ -342,10 +377,11 @@ class LoginButton extends StatelessWidget {
         style: ElevatedButton.styleFrom(
           backgroundColor: Colors.transparent,
           shadowColor: Colors.transparent,
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(30)),
+          shape:
+              RoundedRectangleBorder(borderRadius: BorderRadius.circular(30)),
         ),
         child: const Text(
-          'INICIAR SESIÓN', // Corregido a Iniciar Sesión
+          'INICIAR SESIÓN',
           style: TextStyle(
             fontSize: 13,
             color: Colors.white,
