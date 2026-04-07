@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http; 
+import 'package:flutter_app_liftmove/core/api_config.dart';
 import 'dart:convert';                   
 import 'package:flutter_app_liftmove/core/theme/app_theme.dart';
 import 'package:flutter_app_liftmove/core/theme/widgets/question_scaffold.dart';
@@ -57,8 +58,7 @@ class _SurveyScreenState extends State<SurveyScreen> {
   Future<void> _registrarUsuario() async {
     setState(() => _isLoading = true);
 
-    const String baseUrl = 'http://10.0.2.2:8000'; 
-    final url = Uri.parse('$baseUrl/register');
+    final url = Uri.parse('${ApiConfig.baseUrl}/register');
 
     final String sexo     = _isMale ? 'M' : 'F';
     final String objetivo = _metas.join(', ');

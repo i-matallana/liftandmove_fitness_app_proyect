@@ -1,6 +1,7 @@
 import 'dart:core';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http; 
+import 'package:flutter_app_liftmove/core/api_config.dart';
 import 'dart:convert'; 
 import 'package:flutter_app_liftmove/core/theme/app_theme.dart';
 import 'package:flutter_app_liftmove/core/theme/widgets/customs_bg.dart';
@@ -65,7 +66,7 @@ class _LoginScreenState extends State<LoginScreen> {
     setState(() => _isLoading = true);
 
 
-    final url = Uri.parse('http://127.0.0.1:8000/login');
+    final url = Uri.parse('${ApiConfig.baseUrl}/login');
 
     try {
       final response = await http.post(
